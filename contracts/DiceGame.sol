@@ -3,6 +3,19 @@
 pragma solidity ^0.8.7;
 
 contract DiceGame {
+    struct Game {
+        uint256 bet;
+        uint256 roll;
+        bool won;
+        address player;
+    }
+
+    Game[] games;
+
+    function getGames() public view returns (Game[] memory) {
+        return games;
+    }
+
     // Esse é o dono do contrato
     address owner;
 
@@ -55,15 +68,20 @@ contract DiceGame {
         // Verifica se o contrato tem dinheiro para cobrir a aposta, caso ela seja vencedora
         require(
             msg.value * 6 < address(this).balance,
-            "We don't have enough funds for this bet"
+            "Not enough funds to cover"
         );
         // Verifica se o numero está entre 1 e 6 inclusivo.
-        require(number > 0 && number < 7, "Number should be between 1 and 6");
+        require(number > 0 && number < 7, "Should be between 1 and 6");
 
         // Gera o número do dado
         uint256 diceRoll = rollDice();
 
-        if (diceRoll == number) {
+        bool won = diceRoll == number;
+
+        // Adiciona o jogo ao array de jogos
+        games.push(Game(msg.value, diceRoll, won, msg.sender));
+
+        if (won) {
             // Se o valor do dado for o mesmo apostado, devolve o dinheiro multiplicado por 5.94 (margem de 1%)
             payable(msg.sender).transfer((msg.value * 600) / 101);
         }
