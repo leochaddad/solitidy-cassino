@@ -10,6 +10,8 @@ contract DiceGame {
         address player;
     }
 
+    event GamePlayed(address indexed player, uint256 roll, bool won);
+
     Game[] games;
 
     function getGames() public view returns (Game[] memory) {
@@ -85,6 +87,9 @@ contract DiceGame {
             // Se o valor do dado for o mesmo apostado, devolve o dinheiro multiplicado por 5.94 (margem de 1%)
             payable(msg.sender).transfer((msg.value * 600) / 101);
         }
+
+        emit GamePlayed(msg.sender, diceRoll, won);
+
         // Devolve o valor que foi sorteado
         return diceRoll;
     }

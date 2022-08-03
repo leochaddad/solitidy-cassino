@@ -1,20 +1,38 @@
 import { ethers } from "ethers";
+import { useEffect, useState } from "react";
 import { useDiceGame } from "../hooks/useDiceGame";
 
 import History from "./History";
 
 export default function Game() {
-  const { contract } = useDiceGame();
+  const { contract, getGames } = useDiceGame();
+  const [loading, setLoading] = useState(false);
 
   async function bet() {
-    const res = await contract.bet(2, {
-      value: ethers.utils.parseEther("1.0"),
-    });
+    setLoading(true);
+    const receipt = await contract
+      .bet(2, {
+        value: ethers.utils.parseEther("1.0"),
+      })
+      .then((t) => t.wait());
 
-    const data = await res.wait();
     console.log("data");
-    console.log(data);
+    console.log(receipt);
   }
+
+  useEffect(() => {
+    contract.removeAllListeners("GamePlayed");
+    contract.on("GamePlayed", (player, roll, won) => {
+      console.log({ player, roll, won });
+      getGames();
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <div>

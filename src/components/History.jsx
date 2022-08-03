@@ -1,15 +1,9 @@
 import { ethers } from "ethers";
-import React, { useState } from "react";
+import React from "react";
 import { useDiceGame } from "../hooks/useDiceGame";
 
 export default function History() {
-  const { contract } = useDiceGame();
-  const [games, setGames] = useState(null);
-
-  const getGames = async () => {
-    const games = await contract.getGames();
-    setGames(games);
-  };
+  const { games, getGames } = useDiceGame();
 
   return (
     <div>
