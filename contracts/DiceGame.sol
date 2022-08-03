@@ -5,12 +5,18 @@ pragma solidity ^0.8.7;
 contract DiceGame {
     struct Game {
         uint256 bet;
+        uint256 number;
         uint256 roll;
         bool won;
         address player;
     }
 
-    event GamePlayed(address indexed player, uint256 roll, bool won);
+    event GamePlayed(
+        address indexed player,
+        uint256 number,
+        uint256 roll,
+        bool won
+    );
 
     Game[] games;
 
@@ -81,14 +87,14 @@ contract DiceGame {
         bool won = diceRoll == number;
 
         // Adiciona o jogo ao array de jogos
-        games.push(Game(msg.value, diceRoll, won, msg.sender));
+        games.push(Game(msg.value, number, diceRoll, won, msg.sender));
 
         if (won) {
             // Se o valor do dado for o mesmo apostado, devolve o dinheiro multiplicado por 5.94 (margem de 1%)
             payable(msg.sender).transfer((msg.value * 600) / 101);
         }
 
-        emit GamePlayed(msg.sender, diceRoll, won);
+        emit GamePlayed(msg.sender, number, diceRoll, won);
 
         // Devolve o valor que foi sorteado
         return diceRoll;
