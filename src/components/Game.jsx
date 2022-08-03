@@ -11,22 +11,21 @@ export default function Game() {
   const [betAmount, setBetAmount] = useState(0.1);
 
   async function bet() {
-    setLoading(true);
     const receipt = await contract
       .bet(diceNumber, {
         value: ethers.utils.parseEther("1.0"),
       })
-      .then((t) => t.wait());
+      .then((t) => {
+        setLoading(true);
 
-    console.log("data");
-    console.log(receipt);
+        t.wait();
+      });
   }
 
   useEffect(() => {
     contract.removeAllListeners("GamePlayed");
     contract.on("GamePlayed", (player, number, roll, won) => {
-      console.log({ player, number, roll, won });
-      getGames();
+      // alert(`${player} played ${number} and rolled ${roll} and won ${won}`);
       setLoading(false);
     });
   }, []);
