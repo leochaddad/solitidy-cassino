@@ -3,21 +3,28 @@ import { useEffect, useState } from "react";
 import { useDiceGame } from "../hooks/useDiceGame";
 
 import History from "./History";
+import Result from "./Result";
 
 export default function Game() {
-  const { contract, getGames } = useDiceGame();
-  const [loading, setLoading] = useState(false);
-  const [diceNumber, setDiceNumber] = useState(1);
+  const { contract } = useDiceGame();
+
+  const [diceNumber, setDiceNumber] = useState(null);
   const [betAmount, setBetAmount] = useState(0.1);
+  const [result, setResult] = useState({
+    number: null,
+    roll: null,
+  });
 
   async function bet() {
-    const receipt = await contract
+    await contract
       .bet(diceNumber, {
         value: ethers.utils.parseEther("1.0"),
       })
       .then((t) => {
-        setLoading(true);
-
+        setResult({
+          number: diceNumber,
+          roll: "LOADING",
+        });
         t.wait();
       });
   }
@@ -25,33 +32,58 @@ export default function Game() {
   useEffect(() => {
     contract.removeAllListeners("GamePlayed");
     contract.on("GamePlayed", (player, number, roll, won) => {
-      // alert(`${player} played ${number} and rolled ${roll} and won ${won}`);
-      setLoading(false);
+      setResult({
+        number: ethers.BigNumber.from(number).toNumber(),
+        roll: ethers.BigNumber.from(roll).toNumber(),
+      });
     });
   }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <>
-      <div>
-        <select
-          onChange={(e) => {
-            setDiceNumber(e.target.value);
-          }}
-        >
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-        </select>
-        <button onClick={bet}> Bet 1 ETH </button>
+      <div class="card w-96 bg-base-100 shadow-xl m-auto ">
+        <div class="card-body">
+          {result.roll ? (
+            <Result
+              result={result}
+              playAgain={() => {
+                setResult({
+                  number: null,
+                  roll: null,
+                });
+              }}
+            />
+          ) : (
+            <div>
+              <select
+                className="select w-full max-w-xs  select-secondary "
+                onChange={(e) => {
+                  setDiceNumber(e.target.value);
+                }}
+              >
+                <option disabled selected>
+                  Escolha o número do dado
+                </option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+              </select>
+              <div class="card-actions justify-end mt-4">
+                <button
+                  onClick={bet}
+                  className="btn btn-primary"
+                  disabled={diceNumber === null || result.roll === "LOADING"}
+                >
+                  Apostar 1 ether
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-      <History />
     </>
   );
 }
