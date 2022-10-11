@@ -32,6 +32,7 @@ export default function Game() {
   useEffect(() => {
     contract.removeAllListeners("GamePlayed");
     contract.on("GamePlayed", (player, number, roll, won) => {
+      console.log;
       setResult({
         number: ethers.BigNumber.from(number).toNumber(),
         roll: ethers.BigNumber.from(roll).toNumber(),
@@ -41,8 +42,8 @@ export default function Game() {
 
   return (
     <>
-      <div class="card w-96 bg-base-100 shadow-xl m-auto ">
-        <div class="card-body">
+      <div class="card bg-base-100 shadow-xl m-auto mt-16 w-fit ">
+        <div class="card-body opacity-1">
           {result.roll ? (
             <Result
               result={result}

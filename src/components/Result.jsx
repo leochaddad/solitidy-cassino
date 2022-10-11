@@ -1,18 +1,24 @@
 import React from "react";
+import Dice from "./Dice";
 
 export default function Result({ result, playAgain }) {
   const loading = result.roll === "LOADING";
+  const number = Number.isInteger(result.number)
+    ? result.number
+    : Number.parseInt(result.number);
 
   return (
     <div>
       <div className="stats shadow">
         <div className="stat">
           <div className="stat-title">Sua aposta</div>
-          <div className="stat-value">{result.number}</div>
+          <div className="stat-value">{<Dice value={number} />}</div>
         </div>
         <div className="stat">
           <div className="stat-title">Resultado</div>
-          <div className="stat-value">{result.roll}</div>
+          <div className="stat-value">
+            {<Dice value={result.roll} isRolling={loading} />}
+          </div>
         </div>
       </div>
       {!loading && (

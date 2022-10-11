@@ -22,8 +22,9 @@ export default function Balance() {
   }, []);
 
   return (
-    <div className="navbar bg-base-100">
-      <a className="btn btn-ghost normal-case text-xl">
+    <div className="navbar bg-base-100 space-x-2">
+      <a className="btn btn-ghost normal-case text-xl">Cassino</a>
+      <a className="normal-case text-sm">
         Balance: {ethers.utils.formatEther(balance)} ETH
       </a>
     </div>
